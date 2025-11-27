@@ -30,12 +30,12 @@ public class turret extends OpMode {
     private static final double MAX_DIST_M = placeholder;        // far shot
 
     // Shooter RPM at close / far (find these on the field)
-    private static final double MIN_RPM = 2400;          // at MIN_DIST_M
-    private static final double MAX_RPM = 4200;          // at MAX_DIST_M
+    private static final double MIN_RPM = 2400;          // at MIN_DIST_M (check and tune) 
+    private static final double MAX_RPM = 4200;          // at MAX_DIST_M (check and tune)
 
     // Hood servo positions (0–1) at close / far
-    private static final double MIN_HOOD_POS = 0.30;     // at MIN_DIST_M
-    private static final double MAX_HOOD_POS = 0.60;     // at MAX_DIST_M
+    private static final double MIN_HOOD_POS = 0.30;     // at MIN_DIST_M (check and tune)
+    private static final double MAX_HOOD_POS = 0.60;     // at MAX_DIST_M (Check and tune before)
 
     @Override
     public void init() {
@@ -100,11 +100,8 @@ public class turret extends OpMode {
         } else {
             shooterLeft.setVelocity(0);
             shooterRight.setVelocity(0);
-            // optional: park hood
-            // hoodedServo.setPosition(MIN_HOOD_POS);
         }
 
-        // 8) Telemetry
         telemetry.addData("LL distance (m)", distanceMeters);
         telemetry.addData("Clamped d", d);
         telemetry.addData("t (0–1)", t);
@@ -119,6 +116,7 @@ public class turret extends OpMode {
     public void stop() {
         shooterLeft.setVelocity(0);
         shooterRight.setVelocity(0);
+        limelight.stop();
         telemetry.addData("Status", "Stopped");
         telemetry.update();
     }
