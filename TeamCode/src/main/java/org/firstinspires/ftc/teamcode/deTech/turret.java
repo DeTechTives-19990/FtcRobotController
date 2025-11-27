@@ -6,8 +6,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
-import org.firstinspires.ftc.teamcode.vision.Limelight3A;
-import 
+import org.firstinspires.ftc.teamcode.deTech.vision.Limelight3A;
+import org.firstinspires.ftc.teamcode.deTech.Limelight3A;
+import org.firstinspires.ftc.teamcode.deTech.LimelightDistance;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+
 
 
 // Your Limelight class – adjust package if needed
