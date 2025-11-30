@@ -89,6 +89,6 @@ public class turrettune extends OpMode {
     @Override
     public void stop() {
         shooterLeft.setPower(0);
-        shooterRight.setPower(0);
+        //shooterRight.setPower(0);
     }
 }
