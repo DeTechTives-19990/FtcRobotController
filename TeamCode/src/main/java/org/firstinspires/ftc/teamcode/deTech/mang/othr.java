@@ -8,23 +8,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 import static org.firstinspires.ftc.teamcode.deTech.data.*;
 
 public class othr {
-    private DcMotorEx othrMotrIntk;
     private DcMotorEx othrMotrTurt;
-
-    private DcMotorEx othrMotrFlyiRigt;
-    private DcMotorEx othrMotrFlyiLeft;
-
+    private DcMotorEx othrMotrFlyi;
+    private DcMotorEx othrMotrIntk;
+    
+    private Servo othrServKick;
     private Servo othrServSpin;
-    private Servo othrServHusk;
-    private Servo othrServFlip;
     private Servo othrServFlyi;
 
-    private double[] othrMotrFlyiRigtEnco = new double[] {0.0, 0.0, 0.0};
-    private double[] othrMotrFlyiLeftEnco = new double[] {0.0, 0.0, 0.0};
-
-    private boti botiObji;
-
+    private double[] othrMotrFlyiEnco = new double[] {0.0, 0.0, 0.0};
     protected LinearOpMode opmo;
+    private boti botiObji;
 
     public void INIT() {
         motrINIT();
@@ -32,46 +26,33 @@ public class othr {
     }
 
     private void motrINIT() {
-        othrMotrIntk = opmo.hardwareMap.get(DcMotorEx.class, "othrMotrIntk");
-        othrMotrTurt = opmo.hardwareMap.get(DcMotorEx.class, "othrMotrTurt");
+        othrMotrTurt = opmo.hardwareMap.get(DcMotorEx.class, "motrTurt");
+        othrMotrFlyi = opmo.hardwareMap.get(DcMotorEx.class, "motrFlyi");
+        othrMotrIntk = opmo.hardwareMap.get(DcMotorEx.class, "motrIntk");
 
-        othrMotrFlyiRigt = opmo.hardwareMap.get(DcMotorEx.class, "othrMotrFlyiRigt");
-        othrMotrFlyiLeft = opmo.hardwareMap.get(DcMotorEx.class, "othrMotrFlyiLeft");
-
-        othrMotrFlyiRigt.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        othrMotrFlyiLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        othrMotrFlyiRigt.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        othrMotrFlyiLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        othrMotrFlyi.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        othrMotrFlyi.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //.setDirection(dataMotrRevr);
     }
 
     private void servINIT() {
-        othrServSpin = opmo.hardwareMap.get(Servo.class, "othrServSpin");
-        othrServHusk = opmo.hardwareMap.get(Servo.class, "othrServHusk");
-        othrServFlip = opmo.hardwareMap.get(Servo.class, "othrServFlip");
-        othrServFlyi = opmo.hardwareMap.get(Servo.class, "othrServFlyi");
+        othrServKick = opmo.hardwareMap.get(Servo.class, "servKck");
+        othrServSpin = opmo.hardwareMap.get(Servo.class, "servSpin");
+        othrServFlyi = opmo.hardwareMap.get(Servo.class, "servFlyi");
     }
 
     public void updt(double updtDelt) {
-        othrMotrFlyiRigtEnco[1] = othrMotrFlyiRigtEnco[0];
-        othrMotrFlyiRigtEnco[0] = othrMotrFlyiRigt.getCurrentPosition();
-        othrMotrFlyiRigtEnco[2] = (othrMotrFlyiRigtEnco[0] - othrMotrFlyiRigtEnco[1]) * updtDelt;
-
-        othrMotrFlyiLeftEnco[1] = othrMotrFlyiLeftEnco[0];
-        othrMotrFlyiLeftEnco[0] = othrMotrFlyiLeft.getCurrentPosition();
-        othrMotrFlyiLeftEnco[2] = (othrMotrFlyiLeftEnco[0] - othrMotrFlyiLeftEnco[1]) * updtDelt;
+        othrMotrFlyiEnco[1] = othrMotrFlyiEnco[0];
+        othrMotrFlyiEnco[0] = othrMotrFlyi.getCurrentPosition();
+        othrMotrFlyiEnco[2] = (othrMotrFlyiEnco[0] - othrMotrFlyiEnco[1]) * updtDelt;
     }
 
     public void shot(boolean shotFire) {
         if (shotFire) {
-            othrMotrFlyiRigt.setVelocity((dataRoboShot - (othrMotrFlyiRigtEnco[2] - dataRoboShot) / dataRoboShotFixi) / botiObji.getVolt());
-            othrMotrFlyiLeft.setVelocity((dataRoboShot - (othrMotrFlyiLeftEnco[2] - dataRoboShot) / dataRoboShotFixi) / botiObji.getVolt());
+            othrMotrFlyi.setVelocity((dataRoboShot - (othrMotrFlyiEnco[2] - dataRoboShot) / dataRoboShotFixi) / botiObji.getVolt());
         } else {
-            othrMotrFlyiRigt.setVelocity(0);
-            othrMotrFlyiLeft.setVelocity(0);
+            othrMotrFlyi.setVelocity(0);
         }
     }
-
 }
