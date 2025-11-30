@@ -1,5 +1,5 @@
+//** Wait venka dont touch any of this dont worry about shooting i'll finish it during class next week;
 package org.firstinspires.ftc.teamcode.deTech;
-
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,110 +13,110 @@ public class ShooterTuner extends OpMode {
 
     private DcMotorEx shooterLeft  = null;
     private Servo hoodedServo      = null;
-    private Limelight3A limelight  = null;   
+    private Limelight3A limelight  = null;
 
-    private double shooterPower = 0.0;
-    private double hoodPos      = 0.50;
-    
-    private static final double POWER_STEP = 0.01;
-    private static final double HOOD_STEP  = 0.005;
+    private static final double TICKS_PER_REV_SHOOTER = 28.0;  
+    private static final double CLOSE_HOOD_POS        = 0.55; //Tune 
+    private static final double FAR_HOOD_POS          = 0.45; //Tune
+
+    private static final double POWER_STEP     = 0.01;
     private static final double STICK_DEADZONE = 0.3;
-
-    private static final double TICKS_PER_REV = 28.0;
 
     private static final int MAX_SAMPLES = 10;
     private double[] sampleDist  = new double[MAX_SAMPLES];
     private double[] sampleRpm   = new double[MAX_SAMPLES];
     private double[] sampleHood  = new double[MAX_SAMPLES];
-    private int sampleCount = 0;
-    private boolean lastA = false;
+    private String[] sampleMode  = new String[MAX_SAMPLES];  
+    private int sampleCount      = 0;
+    private boolean lastA        = false;
 
+    private double shooterPower  = 0.0;
+    private double currentHoodPos = CLOSE_HOOD_POS;
+    private boolean closeMode    = true; 
     @Override
     public void init() {
-        shooterLeft  = hardwareMap.get(DcMotorEx.class, "shooterLeft");
-        hoodedServo  = hardwareMap.get(Servo.class, "hoodedServo");
-        limelight    = hardwareMap.get(Limelight3A.class,"limelight");
+        shooterLeft = hardwareMap.get(DcMotorEx.class, "shooterLeft");
+        hoodedServo = hardwareMap.get(Servo.class,      "hoodedServo");
+        limelight   = hardwareMap.get(Limelight3A.class,"limelight");
 
         shooterLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shooterLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        hoodedServo.setPosition(hoodPos);
-
-        // Optional: start limelight, set pipeline
         limelight.start();
-        // limelight.pipelineSwitch(0);
+        closeMode = true;
+        currentHoodPos = CLOSE_HOOD_POS;
+        hoodedServo.setPosition(currentHoodPos);
 
         telemetry.addLine("ShooterTuner INIT");
-        telemetry.addLine("Left stick X  -> shooter power");
-        telemetry.addLine("Right stick X -> hood position");
-        telemetry.addLine("Press A to record (distance, RPM, hood)");
+        telemetry.addLine("Controls:");
+        telemetry.addLine("  Left stick X: adjust shooter power");
+        telemetry.addLine("  X: CLOSE hood preset");
+        telemetry.addLine("  Y: FAR hood preset");
+        telemetry.addLine("  A: record sample (distance, RPM, hood, mode)");
         telemetry.update();
     }
 
     @Override
     public void loop() {
-        //Adjust shooter power with left stick X 
+        if (gamepad1.x) {
+            closeMode = true;
+            currentHoodPos = CLOSE_HOOD_POS;
+        } else if (gamepad1.y) {
+            closeMode = false;
+            currentHoodPos = FAR_HOOD_POS;
+        }
+
         double lx = gamepad1.left_stick_x;
         if (Math.abs(lx) > STICK_DEADZONE) {
             shooterPower += lx * POWER_STEP;
         }
         shooterPower = Range.clip(shooterPower, 0.0, 1.0);
 
-        //adjust hood position with right stick X
-        double rx = gamepad1.right_stick_x;
-        if (Math.abs(rx) > STICK_DEADZONE) {
-            hoodPos += rx * HOOD_STEP;
-        }
-        hoodPos = Range.clip(hoodPos, 0.0, 1.0);
-
         shooterLeft.setPower(shooterPower);
-        hoodedServo.setPosition(hoodPos);
+        hoodedServo.setPosition(currentHoodPos);
 
-        // Compute RPM from encoder velocity
         double ticksPerSec = shooterLeft.getVelocity();
-        double rpm = (ticksPerSec * 60.0) / TICKS_PER_REV;
+        double rpm = (ticksPerSec * 60.0) / TICKS_PER_REV_SHOOTER;
 
-        double distance = 0.0;
+        double distanceInches = 0.0;
         try {
-            if (limelight != null) {
-                distance = Limelightlibrary.getDistance(limelight);
-            }
+            distanceInches = Limelightlibray.getDistance(limelight);
         } catch (Exception e) {
+            // ignore if LL not happy
         }
 
         boolean a = gamepad1.a;
         if (a && !lastA && sampleCount < MAX_SAMPLES) {
-            sampleDist[sampleCount] = distance;
-            sampleRpm[sampleCount]  = rpm;
-            sampleHood[sampleCount] = hoodPos;
+            sampleDist[sampleCount]  = distanceInches;
+            sampleRpm[sampleCount]   = rpm;
+            sampleHood[sampleCount]  = currentHoodPos;
+            sampleMode[sampleCount]  = closeMode ? "C" : "F";  // C = close hood, F = far hood
             sampleCount++;
         }
         lastA = a;
 
-        
-
-        // Telemetry
-        telemetry.addLine("=== Live Values ===");
+        telemetry.addLine("=== Live ===");
         telemetry.addData("Power", "%.3f", shooterPower);
         telemetry.addData("RPM",   "%.1f", rpm);
-        telemetry.addData("Hood",  "%.3f", hoodPos);
-        telemetry.addData("Dist",  "%.2f", distance);
+        telemetry.addData("Dist (in)", "%.1f", distanceInches);
+        telemetry.addData("HoodPos", "%.3f", currentHoodPos);
+        telemetry.addData("Mode", closeMode ? "CLOSE" : "FAR");
 
- //       telemetry.addLine("=== Samples (press A to save) ===");
+        telemetry.addLine("=== Samples (Press A) ===");
         for (int i = 0; i < sampleCount; i++) {
             telemetry.addData(
                     "S" + i,
-                    "d=%.2f  rpm=%.1f  hood=%.3f",
-                    sampleDist[i], sampleRpm[i], sampleHood[i]
+                    "%s d=%.1f in  rpm=%.1f  hood=%.3f",
+                    sampleMode[i], sampleDist[i], sampleRpm[i], sampleHood[i]
             );
         }
+
         telemetry.update();
     }
 
     @Override
     public void stop() {
         shooterLeft.setPower(0);
-        limelight.stop(); 
-        hoodedServo.setPosition(0.5);// if you have this
+        limelight.stop();
     }
 }
