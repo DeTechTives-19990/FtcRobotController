@@ -10,9 +10,9 @@ public class LimelightDistance {
         double ty = limelight.getTy();
         double totalAngle = LIMELIGHT_MOUNT_ANGLE + ty; /// we gotta find the angle of limelight mounted
         double angleRad = Math.toRadians(totalAngle);
-
+        
         // Distance in SAME UNITS as heights above
-        double distance = (TARGET_HEIGHT - LIMELIGHT_HEIGHT) / Math.tan(angleRad);
+        double distance = (29.5 - 12.25) / Math.tan(angleRad);
         return distance;
 
         //try this if it doenst work:
