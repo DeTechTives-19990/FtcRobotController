@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.Range;
 public class turrettune extends OpMode {
 
     private DcMotorEx shooterLeft;
-    private DcMotorEx shooterRight;
+  //  private DcMotorEx shooterRight;
     private Servo hoodedServo;
 
     // values you’re tweaking
@@ -33,15 +33,15 @@ public class turrettune extends OpMode {
         hoodedServo  = hardwareMap.get(Servo.class,    "hoodedServo");
 
         shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+     //   shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // so both wheels spin same direction
-        shooterRight.setDirection(DcMotor.Direction.REVERSE);
+     //   shooterRight.setDirection(DcMotor.Direction.REVERSE);
 
         hoodPos = 0.5;
         hoodedServo.setPosition(hoodPos);
 
-        telemetry.addLine("Simple shooter/servo RPM tuner ready");
+       // telemetry.addLine("Simple shooter/servo RPM tuner ready");
         telemetry.update();
     }
 
@@ -69,7 +69,7 @@ public class turrettune extends OpMode {
 
         // apply to hardware
         shooterLeft.setPower(shooterPower);
-        shooterRight.setPower(shooterPower);
+       // shooterRight.setPower(shooterPower);//
         hoodedServo.setPosition(hoodPos);
 
         // ==== read RPM from encoder ====
@@ -82,7 +82,7 @@ public class turrettune extends OpMode {
         telemetry.addData("Shooter RPM", "%.1f", rpm);
         telemetry.addData("Hood Servo Pos", "%.3f", hoodPos);
         telemetry.addLine("LS X: power +/-");
-        telemetry.addLine("RS X: servo +/-");
+      //  telemetry.addLine("RS X: servo +/-");
         telemetry.update();
     }
 
