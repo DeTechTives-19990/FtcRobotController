@@ -8,7 +8,7 @@ public class LimelightDistance {
 
     public static double getDistance(Limelight3A limelight) {
         double ty = limelight.getTy();
-        double totalAngle = LIMELIGHT_MOUNT_ANGLE + ty; /// we gotta find the angle of limelight mounted
+        double totalAngle = 30 + ty; /// we gotta find the angle of limelight mounted
         double angleRad = Math.toRadians(totalAngle);
         
         // Distance in SAME UNITS as heights above
