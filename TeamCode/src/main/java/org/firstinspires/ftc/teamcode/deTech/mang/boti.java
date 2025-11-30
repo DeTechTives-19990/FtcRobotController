@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.deTech.mang;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -21,7 +20,6 @@ public class boti {
 
     private GoBildaPinpointDriver botiOdoi;
     private VoltageSensor botiVolt;
-    private Telemetry botiTele;
     private IMU botiImui;
 
     public Pose2D botiPosiNewi;
@@ -91,7 +89,7 @@ public class boti {
     // voltage sensor
 
     public double getVolt() {
-        return botiVolt.getVoltage();
+        return Math.max(1, botiVolt.getVoltage() / 12.0);
     }
 
     // odo
@@ -134,14 +132,13 @@ public class boti {
 
     public void drivXYWi(double drivX, double drivY, double drivW, double drivPowr) {
         double drivDeno = Math.max(Math.abs(drivX) + Math.abs(drivY) + Math.abs(drivW), 1);
-        double drivVolt = getVolt() / 12;
 
         // channy, u know what to do (fix the minus and plus signs below if the bot is not moving forward)
 
-        double drivRigtForw = (drivX + drivY + drivW) / drivDeno / drivVolt * drivPowr;
-        double drivLeftForw = (drivX - drivY - drivW) / drivDeno / drivVolt * drivPowr;
-        double drivRigtBack = (drivX - drivY + drivW) / drivDeno / drivVolt * drivPowr;
-        double drivLeftBack = (drivX + drivY - drivW) / drivDeno / drivVolt * drivPowr;
+        double drivRigtForw = (drivX + drivY + drivW) / drivDeno / getVolt() * drivPowr;
+        double drivLeftForw = (drivX - drivY - drivW) / drivDeno / getVolt() * drivPowr;
+        double drivRigtBack = (drivX - drivY + drivW) / drivDeno / getVolt() * drivPowr;
+        double drivLeftBack = (drivX + drivY - drivW) / drivDeno / getVolt() * drivPowr;
 
         botiMotrRigtForw.setPower(drivRigtForw);
         botiMotrLeftForw.setPower(drivLeftForw);

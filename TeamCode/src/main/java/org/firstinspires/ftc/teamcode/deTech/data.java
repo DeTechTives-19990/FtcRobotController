@@ -25,6 +25,9 @@ public class data {
     public static final double dataWhelDiam = 3.5;
     public static final double dataWhelCirc = dataWhelDiam * Math.PI;
 
+    public static final double dataRoboShot = 1800.0;
+    public static final double dataRoboShotFixi = 7.25;
+
     public static final double dataUnivAcur = 0.0001;
     public static final double dataRoboOffi = 90.0;
 }
