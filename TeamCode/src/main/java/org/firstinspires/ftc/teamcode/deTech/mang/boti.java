@@ -42,10 +42,10 @@ public class boti {
     }
 
     private void motrINIT() {
-        botiMotrRigtForw = opmo.hardwareMap.get(DcMotorEx.class, "botiMotrRigtForw");
-        botiMotrLeftForw = opmo.hardwareMap.get(DcMotorEx.class, "botiMotrLeftForw");
-        botiMotrRigtBack = opmo.hardwareMap.get(DcMotorEx.class, "botiMotrRigtBack");
-        botiMotrLeftBack = opmo.hardwareMap.get(DcMotorEx.class, "botiMotrLeftBack");
+        botiMotrRigtForw = opmo.hardwareMap.get(DcMotorEx.class, "rigtForw");
+        botiMotrLeftForw = opmo.hardwareMap.get(DcMotorEx.class, "leftForw");
+        botiMotrRigtBack = opmo.hardwareMap.get(DcMotorEx.class, "rigtBack");
+        botiMotrLeftBack = opmo.hardwareMap.get(DcMotorEx.class, "leftBack");
 
         botiMotrRigtForw.setZeroPowerBehavior(dataMotrBrak);
         botiMotrLeftForw.setZeroPowerBehavior(dataMotrBrak);
@@ -57,7 +57,7 @@ public class boti {
     }
 
     private void imuiINIT() {
-        botiImui = opmo.hardwareMap.get(IMU.class, "botiImui");
+        botiImui = opmo.hardwareMap.get(IMU.class, "imui");
 
         IMU.Parameters botImuiParm = new IMU.Parameters(new RevHubOrientationOnRobot(dataReviLogo, dataReviUSBi));
 
@@ -70,7 +70,7 @@ public class boti {
     }
 
     private void odoiINIT() {
-        botiOdoi = opmo.hardwareMap.get(GoBildaPinpointDriver.class, "botiOdoi");
+        botiOdoi = opmo.hardwareMap.get(GoBildaPinpointDriver.class, "odoi");
 
         // Fix the offsets channy
         botiOdoi.setOffsets(8.5, 1.0, dataUnivDist);
