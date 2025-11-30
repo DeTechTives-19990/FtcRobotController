@@ -23,7 +23,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 public class turret extends OpMode {
 
     private DcMotorEx shooterLeft  = null;
-    private DcMotorEx shooterRight = null;
+  //  private DcMotorEx shooterRight = null;
     private Servo hoodedServo      = null;
     private Limelight3A limelight  = null;   // works like DcMotor
 
@@ -52,18 +52,18 @@ public class turret extends OpMode {
 
         // --- Map hardware ---
         shooterLeft  = hardwareMap.get(DcMotorEx.class, "shooterLeft");
-        shooterRight = hardwareMap.get(DcMotorEx.class, "shooterRight");
+     //   shooterRight = hardwareMap.get(DcMotorEx.class, "shooterRight");
         hoodedServo  = hardwareMap.get(Servo.class,      "hoodedServo");
         limelight    = hardwareMap.get(Limelight3A.class, "limelight");
 
         shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    //    shooterRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    //    shooterRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         shooterLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+      //  shooterRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 //IDK I forgot which one has to spin counterclockwise -> tune tmr
         shooterRight.setDirection(DcMotor.Direction.REVERSE);
 
@@ -104,11 +104,11 @@ public class turret extends OpMode {
 
         if (enableShooter) {
             shooterLeft.setVelocity(targetTicksPerSec);
-            shooterRight.setVelocity(targetTicksPerSec);
+       //     shooterRight.setVelocity(targetTicksPerSec);
             hoodedServo.setPosition(targetHoodPos);
         } else {
             shooterLeft.setVelocity(0);
-            shooterRight.setVelocity(0);
+       //     shooterRight.setVelocity(0);
         }
 
         telemetry.addData("LL distance (m)", distanceMeters);
@@ -124,7 +124,7 @@ public class turret extends OpMode {
     @Override
     public void stop() {
         shooterLeft.setVelocity(0);
-        shooterRight.setVelocity(0);
+    //    shooterRight.setVelocity(0);
         limelight.stop();
         telemetry.addData("Status", "Stopped");
         telemetry.update();
