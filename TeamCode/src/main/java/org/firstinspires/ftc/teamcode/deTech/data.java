@@ -22,11 +22,12 @@ public class data {
     public static DistanceUnit dataUnivDist = DistanceUnit.INCH;
     public static AngleUnit dataUnivAnge = AngleUnit.DEGREES;
 
-    public static final double dataWhelDiam = 3.5;
-    public static final double dataWhelCirc = dataWhelDiam * Math.PI;
+    public static final double[] dataRoboSpinPosi = new double [] {0.5315, 0.6115, 0.686};
+    public static final double[] dataRoboHoodPosi = new double [] {1.0, 0.25};
+    public static final double[] dataRoboKickPosi = new double [] {0.675, 0.3};
 
-    public static final double dataRoboShot = 1800.0;
-    public static final double dataRoboShotFixi = 7.25;
+    public static final double[] dataRoboShot = new double[] {1400.0, 1800.0};
+    public static final double dataRoboShotFixi = 7.5;
 
     public static final double dataUnivAcur = 0.0001;
     public static final double dataRoboOffi = 90.0;
