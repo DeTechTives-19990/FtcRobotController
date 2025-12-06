@@ -59,9 +59,9 @@ public class opmo extends OpMode {
         if (gamepad2.b && bttiPast[1] == false) { othrObji.spin(); bttiPast[1] = true; }
         if (gamepad2.b == false) { bttiPast[1] = false; }
         
-        if (gamepad2.dpad_up) { othrObji.hood(1); othrObji.fire(1);
-        } else if (gamepad2.dpad_down) { othrObji.hood(0); othrObji.fire(2);
-        } else { othrObji.fire(0); }
+        if (gamepad2.dpad_up) { othrObji.hood(1); othrObji.fire(0);
+        } else if (gamepad2.dpad_down) { othrObji.hood(0); othrObji.fire(1);
+        } else { othrObji.fire(-1); }
         
         telemetry.addData("Stat", "Loop");
         telemetry.addData("Data", timeData[3]);
