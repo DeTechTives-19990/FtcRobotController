@@ -83,13 +83,7 @@ public class othr {
     }
 
     public void hood(int hoodPosi) {
-        if (hoodPosi == 0) {
-            othrHood = dataRoboHoodPosi[0];
-        } else if (hoodPosi == 1) {
-            othrHood = dataRoboHoodPosi[1];
-        } else {
-            othrHood = dataRoboHoodPosi[2];
-        }
+        othrHood = dataRoboHoodPosi[hoodPosi];
     }
     
     public void kick() {
@@ -115,8 +109,8 @@ public class othr {
     }
     
     public void fire(int fireWay) {
-        if (fireWay != 0) {
-            othrMotrFlyi.setVelocity(dataRoboShot[fireWay - 1] - (othrMotrFlyiEnco[2] - dataRoboShot[fireWay - 1]) / dataRoboShotFixi);
+        if (fireWay != -1) {
+            othrMotrFlyi.setVelocity(dataRoboShot[fireWay] - (othrMotrFlyiEnco[2] - dataRoboShot[fireWay]) / dataRoboShotFixi);
         } else {
             othrMotrFlyi.setVelocity(0);
         }
