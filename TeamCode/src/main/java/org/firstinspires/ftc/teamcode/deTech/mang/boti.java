@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.deTech.mang;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,19 +18,22 @@ public class boti {
     private DcMotorEx botiMotrRigtBack;
     private DcMotorEx botiMotrLeftBack;
 
-    private GoBildaPinpointDriver botiOdoi;
-    private VoltageSensor botiVolt;
-    private IMU botiImui;
+    private GoBildaPinpointDriver botiOdoi = null;
+    private VoltageSensor botiVolt = null;
 
     public Pose2D botiPosiNewi;
     public Pose2D botiPosiOldi;
     public Pose2D botiVelc;
 
-    protected LinearOpMode opmo;
+    protected OpMode opmo;
+    
+    public boti(OpMode opmo) {
+        this.opmo = opmo;
+    }
 
     public void INIT() {
         motrINIT();
-        imuiINIT();
+        voltINIT();
         odoiINIT();
     }
 
@@ -53,15 +56,9 @@ public class boti {
         botiMotrLeftBack.setZeroPowerBehavior(dataMotrBrak);
 
         // Do a thingy for one of the motors if its flipped?
-        // botiMotrRigtForw.setDirection(dataMotrRevr);
-    }
-
-    private void imuiINIT() {
-        botiImui = opmo.hardwareMap.get(IMU.class, "imui");
-
-        IMU.Parameters botImuiParm = new IMU.Parameters(new RevHubOrientationOnRobot(dataReviLogo, dataReviUSBi));
-
-        botiImui.initialize(botImuiParm);
+        botiMotrLeftForw.setDirection(dataMotrRevr);
+        botiMotrRigtForw.setDirection(dataMotrRevr);
+        //botiMotrRigtBack.setDirection(dataMotrRevr);
     }
 
     private void voltINIT() {
@@ -73,17 +70,11 @@ public class boti {
         botiOdoi = opmo.hardwareMap.get(GoBildaPinpointDriver.class, "odoi");
 
         // Fix the offsets channy
-        botiOdoi.setOffsets(8.5, 1.0, dataUnivDist);
+        botiOdoi.setOffsets(8.5, 1.75, dataUnivDist);
         botiOdoi.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         botiOdoi.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
 
         botiOdoi.resetPosAndIMU();
-    }
-
-    // imu
-
-    public double getImu() {
-        return botiImui.getRobotYawPitchRollAngles().getYaw(dataUnivAnge);
     }
 
     // voltage sensor
@@ -107,14 +98,16 @@ public class boti {
     }
 
     private void fixOdoi() {
-        if (Math.abs(botiPosiNewi.getX(dataUnivDist) - botiPosiOldi.getX(dataUnivDist)) < dataUnivAcur) {
-            botiPosiNewi = new Pose2D(dataUnivDist, botiPosiOldi.getX(dataUnivDist), botiPosiNewi.getY(dataUnivDist), dataUnivAnge, botiPosiNewi.getHeading(dataUnivAnge));
-        }
-        if (Math.abs(botiPosiNewi.getY(dataUnivDist) - botiPosiOldi.getY(dataUnivDist)) < dataUnivAcur) {
-            botiPosiNewi = new Pose2D(dataUnivDist, botiPosiNewi.getX(dataUnivDist), botiPosiOldi.getY(dataUnivDist), dataUnivAnge, botiPosiNewi.getHeading(dataUnivAnge));
-        }
-        if (Math.abs(botiPosiNewi.getHeading(dataUnivAnge) - botiPosiOldi.getHeading(dataUnivAnge)) < dataUnivAcur) {
-            botiPosiNewi = new Pose2D(dataUnivDist, botiPosiNewi.getX(dataUnivDist), botiPosiNewi.getY(dataUnivDist), dataUnivAnge, botiPosiOldi.getHeading(dataUnivAnge));
+        if (botiPosiNewi != null & botiPosiOldi != null) {
+            if (Math.abs(botiPosiNewi.getX(dataUnivDist) - botiPosiOldi.getX(dataUnivDist)) < dataUnivAcur) {
+                botiPosiNewi = new Pose2D(dataUnivDist, botiPosiOldi.getX(dataUnivDist), botiPosiNewi.getY(dataUnivDist), dataUnivAnge, botiPosiNewi.getHeading(dataUnivAnge));
+            }
+            if (Math.abs(botiPosiNewi.getY(dataUnivDist) - botiPosiOldi.getY(dataUnivDist)) < dataUnivAcur) {
+                botiPosiNewi = new Pose2D(dataUnivDist, botiPosiNewi.getX(dataUnivDist), botiPosiOldi.getY(dataUnivDist), dataUnivAnge, botiPosiNewi.getHeading(dataUnivAnge));
+            }
+            if (Math.abs(botiPosiNewi.getHeading(dataUnivAnge) - botiPosiOldi.getHeading(dataUnivAnge)) < dataUnivAcur) {
+                botiPosiNewi = new Pose2D(dataUnivDist, botiPosiNewi.getX(dataUnivDist), botiPosiNewi.getY(dataUnivDist), dataUnivAnge, botiPosiOldi.getHeading(dataUnivAnge));
+            }
         }
     }
 
@@ -136,8 +129,8 @@ public class boti {
         // channy, u know what to do (fix the minus and plus signs below if the bot is not moving forward)
 
         double drivRigtForw = (drivX + drivY + drivW) / drivDeno / getVolt() * drivPowr;
-        double drivLeftForw = (drivX - drivY - drivW) / drivDeno / getVolt() * drivPowr;
-        double drivRigtBack = (drivX - drivY + drivW) / drivDeno / getVolt() * drivPowr;
+        double drivLeftForw = (drivX - drivY + drivW) / drivDeno / getVolt() * drivPowr;
+        double drivRigtBack = (drivX - drivY - drivW) / drivDeno / getVolt() * drivPowr;
         double drivLeftBack = (drivX + drivY - drivW) / drivDeno / getVolt() * drivPowr;
 
         botiMotrRigtForw.setPower(drivRigtForw);
