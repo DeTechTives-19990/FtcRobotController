@@ -1,0 +1,96 @@
+package org.firstinspires.ftc.teamcode.deTech;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import static org.firstinspires.ftc.teamcode.deTech.data.*;
+import org.firstinspires.ftc.teamcode.deTech.mang.boti;
+import org.firstinspires.ftc.teamcode.deTech.mang.othr; 
+import org.firstinspires.ftc.teamcode.deTech.mang.limelightreal; 
+
+@TeleOp(name="opmo2_CleanShoot", group="Iterative OpMode")
+public class opmo2 extends OpMode {
+    private ElapsedTime time = new ElapsedTime();
+    private double[] timeData = new double[] {0.0, 0.0, 0.0, 0.0};
+
+    private boti botiObji;
+    private othr othrObji;
+    private limelightreal aimSystem; 
+
+    double bttiPowr = 0.75;
+    boolean[] bttiPast = new boolean[] {false, false}; 
+
+    @Override
+    public void init() {
+        telemetry.addData("Stat", "INIT");
+        
+        botiObji = new boti(this);
+        othrObji = new othr(this);
+        
+        // Initialize the Aim System (motrTurt, motrFlyi, servFlyi)
+        aimSystem = new limelightreal(this, "motrTurt", "motrFlyi", "servHood", "limelight"); 
+
+        botiObji.INIT();
+        othrObji.INIT();
+        aimSystem.initTracking(); 
+    }
+
+    @Override
+    public void loop() {
+        timeData[1] = timeData[0];
+        timeData[0] = (double) time.nanoseconds() / 1000000000;
+        timeData[2] = timeData[0] - timeData[1];
+        timeData[3] = 1 / timeData[2];
+        
+        botiObji.updt();
+        othrObji.updt(timeData[3]); 
+        aimSystem.update(); // CORE: Runs tracking, safety, and auto-aim!
+
+        // --- Gamepad 1: Drive and Power Control ---
+        botiObji.drivXYWi(
+            gamepad1.left_stick_x,
+            gamepad1.left_stick_y,
+            gamepad1.right_stick_x,
+            bttiPowr);
+
+        if (gamepad1.dpad_up) { bttiPowr = 1.0; }
+        if (gamepad1.dpad_right) { bttiPowr = 0.75; }
+        if (gamepad1.dpad_down) { bttiPowr = 0.5; }
+        if (gamepad1.dpad_left) { bttiPowr = 0.25; }
+
+        othrObji.intk(gamepad1.left_bumper); 
+        
+        boolean rbButton = gamepad1.right_bumper;
+        if (rbButton && !bttiPast[1]) {
+            aimSystem.toggleTracking(!aimSystem.isTrackingActive());
+        }
+        bttiPast[1] = rbButton;
+
+        aimSystem.manualTurretControl(gamepad2.right_stick_x);
+
+
+        // --- Gamepad 1: Shoot Trigger (X) ---
+        boolean xButton = gamepad1.x;
+        if (xButton && !bttiPast[0]) { 
+            othrObji.kick(); 
+            bttiPast[0] = true; 
+        }
+        if (xButton == false) { bttiPast[0] = false; }
+
+        
+        // --- Telemetry (Now including Distance!) ---
+        telemetry.addData("Stat", "Loop");
+        telemetry.addData("FPS", timeData[3]);
+        telemetry.addData("Auto Track", aimSystem.isTrackingActive() ? "ON" : "OFF");
+        telemetry.addData("Limelight TX", aimSystem.getCurrentTx());
+        telemetry.addData("Limelight Dist", String.format("%.1f in", aimSystem.getCurrentDistance()));
+        telemetry.update();
+    }
+
+    @Override
+    public void stop() {
+        telemetry.addData("Stat", "Stop");
+        aimSystem.stopTracking(); 
+    }
+}
