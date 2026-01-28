@@ -1,20 +1,20 @@
 @TeleOp(name = "TurretTracking")
 public class TurretTracking extends LinearOpMode {
 
+    private GoBildaPinpointDriver odo;
     private DcMotorEx turretMotor;
     private Servo hoodServo;
-    private Odometry odometry;
     
     // Target position (the goal)
     private double targetX = 0;
     private double targetY = 144;
     
     // Turret encoder config
-    private double TICKS_PER_REV = 537.7;  // adjust for your motor
-    private double GEAR_RATIO = 1.0;       // turret gear ratio
+    private double TICKS_PER_REV = 537.7;
+    private double GEAR_RATIO = 1.0;
     private double TICKS_PER_TURRET_REV = TICKS_PER_REV * GEAR_RATIO;
     
-    // Hood positions (tune these!)
+    // Hood positions
     private double HOOD_CLOSE = 0.3;
     private double HOOD_FAR = 0.7;
     
@@ -24,14 +24,27 @@ public class TurretTracking extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // Turret motor setup
+        // Pinpoint odometry setup
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        
+        // SET THESE TO YOUR ACTUAL POD POSITIONS (mm from robot center)
+        odo.setOffsets(-84.0, -168.0);  // x and y offset in mm
+        
+        // Set encoder directions (depends on how you mounted them)
+        odo.setEncoderDirections(
+            GoBildaPinpointDriver.EncoderDirection.FORWARD,
+            GoBildaPinpointDriver.EncoderDirection.FORWARD
+        );
+        
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.resetPosAndIMU();
+        
+        // Turret setup
         turretMotor = hardwareMap.get(DcMotorEx.class, "turret");
-        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);  // IMPORTANT: zero it with turret centered!
+        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         
         hoodServo = hardwareMap.get(Servo.class, "hood");
-        
-        odometry = new Odometry(hardwareMap);
 
         telemetry.addLine("Make sure turret is centered!");
         telemetry.addLine("Press START when ready");
@@ -40,17 +53,17 @@ public class TurretTracking extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            odometry.update();
+            odo.update();
             
-            double robotX = odometry.getX();
-            double robotY = odometry.getY();
-            double robotHeading = odometry.getHeading();
+            // Pinpoint gives mm, convert to inches
+            double robotX = odo.getPosX() / 25.4;
+            double robotY = odo.getPosY() / 25.4;
+            double robotHeading = odo.getHeading();  // radians
             
             // === TURRET AIM ===
             double angleToTarget = Math.atan2(targetY - robotY, targetX - robotX);
             double turretAngle = normalizeAngle(angleToTarget - robotHeading);
             
-            // Maps -π to π directly to tick range (auto unwinds!)
             int targetTicks = (int) (turretAngle / (2 * Math.PI) * TICKS_PER_TURRET_REV);
             
             turretMotor.setTargetPosition(targetTicks);
@@ -74,11 +87,10 @@ public class TurretTracking extends LinearOpMode {
             
             // === TELEMETRY ===
             telemetry.addData("Robot Pos", "(%.1f, %.1f)", robotX, robotY);
-            telemetry.addData("Robot Heading", "%.1f°", Math.toDegrees(robotHeading));
-            telemetry.addData("Distance to Target", "%.1f in", distance);
+            telemetry.addData("Heading", "%.1f°", Math.toDegrees(robotHeading));
+            telemetry.addData("Distance", "%.1f in", distance);
             telemetry.addData("Turret Angle", "%.1f°", Math.toDegrees(turretAngle));
-            telemetry.addData("Turret Ticks", "%d", targetTicks);
-            telemetry.addData("Hood Position", "%.2f", hoodPos);
+            telemetry.addData("Hood", "%.2f", hoodPos);
             telemetry.update();
         }
     }
