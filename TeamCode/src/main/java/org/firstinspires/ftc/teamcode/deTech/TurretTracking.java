@@ -9,12 +9,12 @@ public class TurretTracking extends LinearOpMode {
     private double targetX = 0;
     private double targetY = 144;
     
-    // Turret encoder config
-    private double TICKS_PER_REV = 537.7;
-    private double GEAR_RATIO = 1.0;
-    private double TICKS_PER_TURRET_REV = TICKS_PER_REV * GEAR_RATIO;
+    // Turret encoder config for 5.2:1 Yellow Jacket with 5:1 external gear ratio
+    private double TICKS_PER_REV = 145.1;
+    private double GEAR_RATIO = 5.0;
+    private double TICKS_PER_TURRET_REV = TICKS_PER_REV * GEAR_RATIO;  // 725.5 ticks
     
-    // Hood positions
+    // Hood positions (tune these!)
     private double HOOD_CLOSE = 0.3;
     private double HOOD_FAR = 0.7;
     
@@ -28,9 +28,9 @@ public class TurretTracking extends LinearOpMode {
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         
         // SET THESE TO YOUR ACTUAL POD POSITIONS (mm from robot center)
-        odo.setOffsets(-84.0, -168.0);  // x and y offset in mm
+        odo.setOffsets(-84.0, -168.0);
         
-        // Set encoder directions (depends on how you mounted them)
+        // Set encoder directions (flip to REVERSED if needed)
         odo.setEncoderDirections(
             GoBildaPinpointDriver.EncoderDirection.FORWARD,
             GoBildaPinpointDriver.EncoderDirection.FORWARD
@@ -43,6 +43,7 @@ public class TurretTracking extends LinearOpMode {
         turretMotor = hardwareMap.get(DcMotorEx.class, "turret");
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turretMotor.setTargetPositionTolerance(5);
         
         hoodServo = hardwareMap.get(Servo.class, "hood");
 
@@ -58,7 +59,7 @@ public class TurretTracking extends LinearOpMode {
             // Pinpoint gives mm, convert to inches
             double robotX = odo.getPosX() / 25.4;
             double robotY = odo.getPosY() / 25.4;
-            double robotHeading = odo.getHeading();  // radians
+            double robotHeading = odo.getHeading();
             
             // === TURRET AIM ===
             double angleToTarget = Math.atan2(targetY - robotY, targetX - robotX);
@@ -90,6 +91,7 @@ public class TurretTracking extends LinearOpMode {
             telemetry.addData("Heading", "%.1f°", Math.toDegrees(robotHeading));
             telemetry.addData("Distance", "%.1f in", distance);
             telemetry.addData("Turret Angle", "%.1f°", Math.toDegrees(turretAngle));
+            telemetry.addData("Turret Ticks", "%d / %d", turretMotor.getCurrentPosition(), targetTicks);
             telemetry.addData("Hood", "%.2f", hoodPos);
             telemetry.update();
         }
